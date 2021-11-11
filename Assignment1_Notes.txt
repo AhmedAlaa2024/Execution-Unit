@@ -1,0 +1,69 @@
+OPCODE = 9-bits
+-----------------------------------------------------------------------------------------------------------------------------------------
+Operation -> 2-bits
+Destination -> 2-bits
+Source -> 5-bits [1-bit (MSB) identify the following bits are value (0) or register address (1) - 4-bits might be value or register]
+-----------------------------------------------------------------------------------------------------------------------------------------
+Operations:
+-----------
+1. 00 -> MOV REG,VAL -> Will be executed on one cycle
+2. 01 -> MOV REG,REG -> Will be executed on one cycle
+3. 10 -> ADD REG,VAL -> Will be executed on two cycles [first use mov to get value, then add value to register]
+4. 11 -> AND REG,VAL -> Will be executed on two cycles [first use mov to get value, then and value to register]
+-----------------------------------------------------------------------------------------------------------------------------------------
+Registers' Addresses:
+---------------------
+1. NULL -> 00
+2.  A	-> 01
+3.  B	-> 10
+4.  C	-> 11
+-----------------------------------------------------------------------------------------------------------------------------------------
+Ex:
+---
+1. MOV REG,VAL -> MOV A,5 -> 00 01 00101 or 01 00 00101
+2. MOV REG,REG -> MOV A,B -> 00 01 00001 or 01 00 00001
+3. ADD REG,VAL -> MOV A,5 -> 10 01 00101
+4. ADD REG,REG -> ADD A,B -> 10 01 00001
+5. AND REG,VAL -> AND A,5 -> 11 01 00101
+6. AND REG,REG -> AND A,B -> 11 01 00001
+-----------------------------------------------------------------------------------------------------------------------------------------
+Questions:
+----------
+1. How many commands does the execution unit have?
+ANS: 6 commands
+
+2. How many bits are required for the user input command?
+ANS: 9-bits
+
+3. How many forbidden inout commands do execution unit have? Give an example
+ANs: 14 commands are forbidden
+Ex:	1. xx 00 xxxxx ;Dummy Command
+	2. xx xx 10000 ;Dummy Command
+	3. xx xx 10100 ;The command tries to access the 5th register which is not exist
+	4. xx xx 10101 ;The command tries to access the 6th register which is not exist
+	5. xx xx 10110 ;The command tries to access the 7th register which is not exist
+	6. xx xx 10111 ;The command tries to access the 8th register which is not exist
+	7. xx xx 11000 ;The command tries to access the 9th register which is not exist
+	8. xx xx 11001 ;The command tries to access the 10th register which is not exist
+	9. xx xx 11010 ;The command tries to access the 11th register which is not exist
+	10. xx xx 11011 ;The command tries to access the 12th register which is not exist
+	11. xx xx 11100 ;The command tries to access the 13th register which is not exist
+	12. xx xx 11101 ;The command tries to access the 14th register which is not exist
+	13. xx xx 11110 ;The command tries to access the 15th register which is not exist
+	14. xx xx 11111 ;The command tries to access the 16th register which is not exist
+SOL: I handled the forbidden commands to be ignored.
+-----------------------------------------------------------------------------------------------------------------------------------------
+Notes:
+------
+1. Reading from RegisterFile is proceed on the +ve edge
+2. Writting to RegisterFile is proceed on the -ve edge
+-----------------------------------------------------------------------------------------------------------------------------------------
+Test Cases:
+-----------
+1. MOV A,5H	-> 00 01 00101 -> 0x025
+2. ADD A,8H	-> 10 01 01000 -> 0x128
+3. MOV B,A	-> 01 10 10001 -> 0x0D1
+4. MOV C,10H	-> 00 11 01010 -> 0x06A
+5. AND C,B	-> 11 11 10010 -> 0x1F2
+6. ADD A,C	-> 10 01 10011 -> 0x133
+7. AND B,A	-> 11 10 10001 -> 0x1D1
